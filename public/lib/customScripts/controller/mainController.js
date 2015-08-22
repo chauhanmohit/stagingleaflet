@@ -1,22 +1,15 @@
 app.controller('mainController',['$scope','$http','$q','$timeout',function($scope,$http,$q,$timeout){
     var geocoder = new google.maps.Geocoder();
     var canceller ;
-    
-    /**
-     *	using google map vectored tiles for the Map
-     **/
-    var map = new L.Map('map', {center: new L.LatLng(41.8838113, -87.6317489), zoom: 16});
-    var googleLayer = new L.Google('ROADMAP');
-    map.addLayer(googleLayer);
-        
+
     /**
      *	using mapbox.js server tiles for the Map
      **/
-    //var tiles = L.tileLayer('http://{s}.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY2hhdWhhbm1vaGl0IiwiYSI6IjE0YTljYTgyY2IzNDVlMmI0MTZhNzMwOGRkMzI4MGY3In0.vNQxFF8XYPTbbjm7fD72mg',{
-    //            maxZoom: 21,
-    //            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors, Points &copy 2012 LINZ'
-    //                    }),latlng = L.latLng(41.8838113, -87.6317489);
-    //var map = L.map('map', {center: latlng, zoom: 16, layers: [tiles]});
+    var tiles = L.tileLayer('http://{s}.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY2hhdWhhbm1vaGl0IiwiYSI6IjE0YTljYTgyY2IzNDVlMmI0MTZhNzMwOGRkMzI4MGY3In0.vNQxFF8XYPTbbjm7fD72mg',{
+                maxZoom: 21,
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors, Points &copy 2012 LINZ'
+                        }),latlng = L.latLng(41.8838113, -87.6317489);
+    var map = L.map('map', {center: latlng, zoom: 16, layers: [tiles]});
     var markers = L.markerClusterGroup({ chunkedLoading: true });
     
     /**
