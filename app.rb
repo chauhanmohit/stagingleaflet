@@ -20,7 +20,7 @@ get "/showData" do
 
     if @lat && @lang && @limit
       client = SODA::Client.new({ :domain => 'data.cityofchicago.org', :app_token => 'v1SkHrbzQcyFmlkL9D5W1UXfT' })
-      response = client.get('6zsd-86xi', {"$where" => "within_circle(location, #{@lat}, #{@lang}, #{@limit})"})
+      response = client.get('6zsd-86xi', {"$where" => "within_circle(location, #{@lat}, #{@lang}, #{@limit})","$limit"=>"500"})
       response.to_json 
     else
       @message ='{ "Error": { "status":400 , "message":"Please Specifiy the location co-ordinates and data limit" } }'
@@ -28,3 +28,4 @@ get "/showData" do
     end
     
 end
+

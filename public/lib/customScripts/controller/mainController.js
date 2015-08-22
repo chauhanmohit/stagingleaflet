@@ -1,96 +1,117 @@
-'use strict'
-app.controller('mainController',['$scope','MapService','$http',function($scope,MapService,$http){
-    $scope.location = {} ;
-    $scope.newPlaceAddress = "Chicago" ;
-    $scope.location.latitude = 41.8838113 ;
-    $scope.location.longitude = -87.6317489;
-    $scope.limit = 100 ;
-    $scope.showLoder = false ;
-    $scope.dynMarkers = [];
+app.controller('mainController',['$scope','$http','$q','$timeout',function($scope,$http,$q,$timeout){
+    var geocoder = new google.maps.Geocoder();
+    var canceller ;
     
-    $scope.$on('mapInitialized', function(event, map) {
-	var marker ;
-	var infowindow ;
-	getData($scope.limit,map);
-	
-	$scope.getAddress = function(){
+    /**
+     *	using google map vectored tiles for the Map
+     **/
+    var map = new L.Map('map', {center: new L.LatLng(41.8838113, -87.6317489), zoom: 16});
+    var googleLayer = new L.Google('ROADMAP');
+    map.addLayer(googleLayer);
+        
+    /**
+     *	using mapbox.js server tiles for the Map
+     **/
+    //var tiles = L.tileLayer('http://{s}.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY2hhdWhhbm1vaGl0IiwiYSI6IjE0YTljYTgyY2IzNDVlMmI0MTZhNzMwOGRkMzI4MGY3In0.vNQxFF8XYPTbbjm7fD72mg',{
+    //            maxZoom: 21,
+    //            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors, Points &copy 2012 LINZ'
+    //                    }),latlng = L.latLng(41.8838113, -87.6317489);
+    //var map = L.map('map', {center: latlng, zoom: 16, layers: [tiles]});
+    var markers = L.markerClusterGroup({ chunkedLoading: true });
+    
+    /**
+     * On page load hit the method to get
+     * Data from api and show the map
+     **/
+    getData(map,markers);
+    
+    /**
+     *  Get latlang on click of showlocation button
+     *  and show the location on map.
+     **/
+    $scope.getAddress = function(){
+        if ($scope.newPlaceAddress != null || $scope.newPlaceAddress !== undefined) {
             var address = $scope.newPlaceAddress ? $scope.newPlaceAddress : "Chicago" ;
-            MapService.geocodeAddress(address).then(function (location) {
-                var pos = {"latitude":location.G,"longitude":location.K} ;
-                $scope.location = pos ;
-                $scope.getDataFromApi($scope.location.latitude,$scope.location.longitude,$scope.limit) ;
+            geocoder.geocode( { 'address': address}, function(results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    var pos = results[0].geometry.location ;
+                    map.panTo(new L.LatLng(pos.lat(), pos.lng()));
+                    getData(map,markers, pos.lat(), pos.lng());
+                } else {
+                    alert("Geocode was not successful for the following reason: " + status);
+                }
             });
         }
-
-	google.maps.event.addListener(map, "dragend", function() {
-	    var zoomLevel = map.getZoom();
-	    var bounds = map.getBounds();
-	    var ne = bounds.getNorthEast();
-	    var sw = bounds.getSouthWest();
-	    var d = getDistance(map.center, ne);
-	    var loc = map.center ;	
-	    $scope.location.latitude = loc.G;
-	    $scope.location.longitude = loc.K;
-	    $scope.limit = d ;
-	    getData($scope.limit,map) ;
-	});
-	
-	var rad = function(x) {
-		return x * Math.PI / 180;
-	};
-
-	var getDistance = function(p1, p2) {
-		var R = 6378137; // Earth?s mean radius in meter
-		var dLat = rad(p2.G - p1.G);
-		var dLong = rad(p2.K - p1.K);
-		var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-			Math.cos(rad(p1.lat())) * Math.cos(rad(p2.lat())) *
-			Math.sin(dLong / 2) * Math.sin(dLong / 2);
-		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-		var d = (R * c) ;
-		console.log(p1.lat(), p2.lat());
-		return d; // returns the distance in meters
-	}
-	
+    }
+    
+    /**
+     *  get the map Dragend event and get
+     *  The latlng to pass the getData method
+     *  to hit the api again
+     **/
+    
+    map.addEventListener('dragend',function(e){
+        var lat = e.target.getCenter().lat;
+        var lng = e.target.getCenter().lng;
+        var distance = e.distance ;
+        getData(map,markers,lat,lng, distance);
     });
-	
-    function getData(limit,evtmap){
-	if (!limit) {
-	    limit = 100
-	}
-	var map = evtmap ;
-	$scope.showLoder = true ;
-	$http.get('/showData?lat='+$scope.location.latitude+'&lang='+$scope.location.longitude+'&limit='+limit)
-	.success(function(res,status,config,header){
+    
+    
+    /**
+     *	get the map Zoom changed event and
+     *	get the Latlng to pass the getData
+     *	method to hit the api again .
+     **/
+    map.addEventListener('zoomend', function(e){
+	var lat = e.target.getCenter().lat;
+        var lng = e.target.getCenter().lng;
+	var ne = e.target.getBounds()._northEast ;
+	var center = {'lat':e.target.getCenter().lat, 'lng': e.target.getCenter().lng}
+	var distance = getDistance(center, ne);
+	getData(map,markers,lat,lng, distance);
+    });    
 
-	    for(var i=0; i<res.length; i++){
-		var latLng = new google.maps.LatLng(res[i].latitude, res[i].longitude);
-		var image = res[i].primary_type == 'ASSAULT' ? 'img/matrimonial.png' : res[i].primary_type == 'NARCOTICS' ? 'img/medical.png' : res[i].primary_type == 'BATTERY' ? 'img/local-services.png' : 'img/saloon.png' ;
-		var marker = new google.maps.Marker({
-				        map:map,
-					position:latLng,
-					icon: image,
-					}) ;
-		var infowindow = new google.maps.InfoWindow(); 
-		bindInfoWindow(marker, map,infowindow, res[i]);
-		$scope.dynMarkers.push(marker);
-	    }
-	    $scope.markerClusterer = new MarkerClusterer(map, $scope.dynMarkers, {});
+    
+    /**
+     *  function to get Data from Scorata Api 
+     *  and resturn response as required
+     **/
+    function getData(map,markers, lat, lng, limit){
+
+        if ( typeof lat == undefined || !lat ) lat = 41.8838113  ;
+        if ( typeof lng == undefined || !lng ) lng = -87.6317489 ;
+        if (typeof limit == undefined || !limit ) limit = 500 ;
+        
+	if (canceller) canceller.resolve("User Intrupt");
+	//creating the defered object
+	canceller = $q.defer();
+	$scope.showLoder = true ;
+        
+        $http.get('/showData?lat='+lat+'&lang='+lng+'&limit='+limit, { timeout: canceller.promise })
+        .success(function(res,status,config,header){
+            for (var i = 0; i < res.length; i++) {
+                var response = getContent(res[i]);
+                var marker = L.marker(new L.LatLng(res[i].latitude, res[i].longitude), response);
+                marker.bindPopup(response);
+                markers.addLayer(marker);
+            }
+            map.addLayer(markers);
 	    $scope.showLoder = false ;
 	}).error(function(err,status,config,header){
-	    console.log("Error comes in this section");
-	});
-    }
-
-    function bindInfoWindow(marker, map, infowindow, content) {
-	google.maps.event.addListener(marker, 'click', function(e) {
-	    var data = getContent(content);
-	    infowindow.close();
-	    infowindow.setContent(data);
-	    infowindow.open(map, marker);
+	    $scope.showLoder = false ;
+	    $timeout(function(){
+		$scope.showLoder = true ;
+	    },500);
+	    console.log("Error comes in this section", err,status);
 	});
     }
     
+    
+    /**
+     *  Customized the data for the onclick
+     *  marke popup
+     **/
     function getContent(data) {
 	var infoData = '<div class="CustomData">'+
                                 '<div class="row">'+
@@ -107,11 +128,7 @@ app.controller('mainController',['$scope','MapService','$http',function($scope,M
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-sm-6"><strong>Date</strong>:</div>'+
-                                    '<div class="col-sm-3">'+ data.date + '</div>'+
-                                '</div>'+
-                                '<div class="row">'+
-                                    '<div class="col-sm-6"><strong>Description</strong>:</div>'+
-                                    '<div class="col-sm-3">'+ data.description + '</div>'+
+                                    '<div class="col-sm-6">'+ new Date(data.date) + '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-sm-6"><strong>Domestic</strong>:</div>'+
@@ -123,7 +140,7 @@ app.controller('mainController',['$scope','MapService','$http',function($scope,M
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-sm-6"><strong>Description</strong>:</div>'+
-                                    '<div class="col-sm-3">'+ data.description + '</div>'+
+                                    '<div class="col-sm-6">'+ data.description + '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-sm-6"><strong>Primary Type</strong>:</div>'+
@@ -137,4 +154,19 @@ app.controller('mainController',['$scope','MapService','$http',function($scope,M
 	return infoData ;
     }
     
+    rad = function(x) {
+    	return x * Math.PI / 180;
+    };
+
+    getDistance = function(p1, p2) {
+	var R = 6378137; // Earth?s mean radius in meter
+	var dLat = rad(p2.lat - p1.lat);
+	var dLong = rad(p2.lng - p1.lng);
+	var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+		Math.cos(rad(p1.lat)) * Math.cos(rad(p2.lat)) *
+		Math.sin(dLong / 2) * Math.sin(dLong / 2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	var d = (R * c) ;
+	return d; // returns the distance in meters
+    }
 }]);

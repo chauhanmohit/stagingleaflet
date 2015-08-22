@@ -5,6 +5,14 @@ html, body{
 body{
   position: relative;
 }
+.form.head-form {
+    float: right;
+    padding: 8px 0;
+}
+.form.head-form input {
+    max-width: 100% !important;
+    width: 300px !important;
+}
 .overlay{
   position: absolute;
   top: 70px;
@@ -19,4 +27,23 @@ body{
     position: absolute;
     top: 25%;
     z-index: 99999;
+}
+.cluster:hover > img {
+    transform: scale(1.2);
+    transition: -moz-transform 0.2s ease-in-out 0s;
+}
+.CustomData {
+    width: 95%;
+}
+p.add{ color:#fff; margin-top: 14px; margin-bottom: 0px;}
+.btn.btn-warning{ background-color: #f47e1f;}
+.nav-bar-top{background:#22B479; border:none; border-radius:0px; margin-bottom: 0;}
+.navbar-inverse .navbar-brand{color:#fff;}
+form.head-form{padding:8px 0px; float:right;}
+form.head-form  input{width:300px !important; max-width:100% !important;}
+
+@media screen and (max-width:767px) {
+form.head-form{width:100%;}
+form.head-form  input{width:100% !important; max-width:100% !important;}
+
 }
