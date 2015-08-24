@@ -96,6 +96,20 @@ form.head-form  input{width:300px !important; max-width:100% !important;}
     margin-top: 6px;
 }
 
+.customLoader {
+    position: fixed;
+}
+.customLoader {
+    left: 43%;
+    margin: 0 auto;
+    position: fixed;
+    top: 36%;
+    width: 120px;
+    z-index: 99999;
+}
+.customLoader img {
+    width: 101px;
+}
 @media screen and (max-width:767px) {
 form.head-form{width:100%;}
 form.head-form  input{width:100% !important; max-width:100% !important;}

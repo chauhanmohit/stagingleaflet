@@ -75,8 +75,8 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
         if ( typeof lat == undefined || !lat ) lat = 41.8838113  ;
         if ( typeof lng == undefined || !lng ) lng = -87.6317489 ;
         if (typeof limit == undefined || !limit ) limit = 500 ;
-	if (typeof $scope.from == undefined || !$scope.from) $scope.from = '2012-09-14' ;
-	if (typeof $scope.to == undefined || !$scope.to) $scope.to = '2012-12-25';
+	if (typeof from == undefined || !from) from = '2012-09-14' ;
+	if (typeof to == undefined || !to) to = '2012-12-25';
 	if (canceller) canceller.resolve("User Intrupt");
 	//creating the defered object
 	canceller = $q.defer();
@@ -94,7 +94,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 			purpleIcon = new LeafIcon({iconUrl: '/map-icon/mark4.png'}),
 			defaultIcon = new LeafIcon({iconUrl: '/map-icon/marker-icon.png'});
     
-        $http.get('/api/web/data.json?lat='+lat+'&lang='+lng+'&limit='+limit+'&from='+$scope.from+'&to='+$scope.to , { timeout: canceller.promise })
+        $http.get('/api/web/data.json?lat='+lat+'&lang='+lng+'&limit='+limit+'&from='+from+'&to='+to , { timeout: canceller.promise })
         .success(function(res,status,config,header){
             for (var i = 0; i < res.length; i++) {
                 var response = getContent(res[i]);
@@ -184,7 +184,9 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
     $('#slider').bind('valuesChanged',function(e, data){
 	var f = new Date(data.values.min);
 	var t = new Date(data.values.max);
-	$scope.from = f.toISOString().slice(0,10);
-	$scope.to = t.toISOString().slice(0,10);
+	var from = f.toISOString().slice(0,10);
+	var to = t.toISOString().slice(0,10);
+	var lat,lng,limit ;
+	getData(map,markers, lat, lng, limit, from, to);
     });
 }]);

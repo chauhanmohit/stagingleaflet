@@ -13,7 +13,27 @@ get "/" do
   erb :"posts/index"
 end
 
-# for desktop or web user to hit the api
+## for desktop or web user to hit the api
+#post "/api/web/data.json" do
+#  content_type :json
+#    request.body.rewind
+#    req = JSON.parse request.body.read
+# 
+#    @lat = req['data']['lat']
+#    @lang = req['data']['lang']
+#    @limit = req['data']['limit']
+#    @from = req['data']['from']
+#    @to = req['data']['to']
+#    
+#    if @lat && @lang && @limit
+#      client = SODA::Client.new({ :domain => 'data.cityofchicago.org', :app_token => 'v1SkHrbzQcyFmlkL9D5W1UXfT' })
+#      response = client.get('6zsd-86xi', {"$where" => "within_circle(location, #{@lat}, #{@lang}, #{@limit}) AND date > '#{@from}' AND date < '#{@to}' ","$limit"=>"200" })
+#      response.to_json 
+#    else
+#      @message ='{ "Error": { "status":400 , "message":"Please Specifiy the location co-ordinates and data limit" } }'
+#      @message.to_json 
+#    end
+#end
 get "/api/web/data.json" do
   content_type :json
   
@@ -25,13 +45,15 @@ get "/api/web/data.json" do
 
     if @lat && @lang && @limit
       client = SODA::Client.new({ :domain => 'data.cityofchicago.org', :app_token => 'v1SkHrbzQcyFmlkL9D5W1UXfT' })
-      response = client.get('6zsd-86xi', {"$where" => "within_circle(location, #{@lat}, #{@lang}, #{@limit}) AND date > '#{@from}' AND date < '#{@to}' ","$limit"=>"200" })
+      response = client.get('6zsd-86xi', {"$where" => "within_circle(location, #{@lat}, #{@lang}, #{@limit}) AND date > '#{@from}' AND date < '#{@to}' ","$limit"=>"500" })
       response.to_json 
     else
       @message ='{ "Error": { "status":400 , "message":"Please Specifiy the location co-ordinates and data limit" } }'
       @message.to_json 
     end
 end
+
+
 
 # for mobile user to hit the api
 get "/api/mobile/data.json" do
