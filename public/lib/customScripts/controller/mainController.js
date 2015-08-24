@@ -1,7 +1,7 @@
 app.controller('mainController',['$scope','$http','$q','$timeout',function($scope,$http,$q,$timeout){
     var geocoder = new google.maps.Geocoder();
     var canceller ;
-
+    $scope.newPlaceAddress = 'Chicago' ;
     /**
      *	using mapbox.js server tiles for the Map
      **/
@@ -70,22 +70,36 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
      *  function to get Data from Scorata Api 
      *  and resturn response as required
      **/
-    function getData(map,markers, lat, lng, limit){
+    function getData(map,markers, lat, lng, limit, from, to){
 
         if ( typeof lat == undefined || !lat ) lat = 41.8838113  ;
         if ( typeof lng == undefined || !lng ) lng = -87.6317489 ;
         if (typeof limit == undefined || !limit ) limit = 500 ;
-        
+	if (typeof $scope.from == undefined || !$scope.from) $scope.from = '2012-09-14' ;
+	if (typeof $scope.to == undefined || !$scope.to) $scope.to = '2012-12-25';
 	if (canceller) canceller.resolve("User Intrupt");
 	//creating the defered object
 	canceller = $q.defer();
 	$scope.showLoder = true ;
-        
-        $http.get('/showData?lat='+lat+'&lang='+lng+'&limit='+limit, { timeout: canceller.promise })
+	var LeafIcon = L.Icon.extend({
+					options: {
+					    shadowUrl: '/map-icon/marker-shadow.png',
+					    iconSize:     [45, 45], // size of the icon
+					    shadowSize:   [41, 41], // size of the shadow
+					}
+				    });
+	var greenIcon = new LeafIcon({iconUrl: '/map-icon/mark1.png'}),
+			redIcon = new LeafIcon({iconUrl: '/map-icon/mark2.png'}),
+			orangeIcon = new LeafIcon({iconUrl: '/map-icon/mark3.png'}),
+			purpleIcon = new LeafIcon({iconUrl: '/map-icon/mark4.png'}),
+			defaultIcon = new LeafIcon({iconUrl: '/map-icon/marker-icon.png'});
+    
+        $http.get('/api/web/data.json?lat='+lat+'&lang='+lng+'&limit='+limit+'&from='+$scope.from+'&to='+$scope.to , { timeout: canceller.promise })
         .success(function(res,status,config,header){
             for (var i = 0; i < res.length; i++) {
                 var response = getContent(res[i]);
-                var marker = L.marker(new L.LatLng(res[i].latitude, res[i].longitude), response);
+		var image = res[i].primary_type == 'ASSAULT' ? redIcon : res[i].primary_type == 'NARCOTICS' ? orangeIcon : res[i].primary_type == 'BATTERY' ? purpleIcon : res[i].primary_type == 'BATTERY' ? defaultIcon: greenIcon ;
+                var marker = L.marker(new L.LatLng(res[i].latitude, res[i].longitude),{icon: image});
                 marker.bindPopup(response);
                 markers.addLayer(marker);
             }
@@ -162,4 +176,15 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	var d = (R * c) ;
 	return d; // returns the distance in meters
     }
+    
+    /**
+     *	jquery code for the Date rage picker slider
+     **/
+    $("#slider").dateRangeSlider();
+    $('#slider').bind('valuesChanged',function(e, data){
+	var f = new Date(data.values.min);
+	var t = new Date(data.values.max);
+	$scope.from = f.toISOString().slice(0,10);
+	$scope.to = t.toISOString().slice(0,10);
+    });
 }]);

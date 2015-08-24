@@ -37,10 +37,64 @@ body{
 }
 p.add{ color:#fff; margin-top: 14px; margin-bottom: 0px;}
 .btn.btn-warning{ background-color: #f47e1f;}
-.nav-bar-top{background:#22B479; border:none; border-radius:0px; margin-bottom: 0;}
+.nav-bar-top{
+    background:#1bb871;
+    border-bottom:none;
+    -webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.1),4px 0px 15px 0px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: inset 0px 2px 2px 0px rgba(255,255,255,0.1),4px 0px 15px 0px rgba(0,0,0,0.3);
+    box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.1),4px 0px 15px 0px rgba(0, 0, 0, 0.3);
+    }
 .navbar-inverse .navbar-brand{color:#fff;}
 form.head-form{padding:8px 0px; float:right;}
 form.head-form  input{width:300px !important; max-width:100% !important;}
+.navbar-brand.logo-brand.demo_logo {
+    margin-top: 15px;
+}
+.navbar-form .form-group {
+    display: inline-block;
+    margin-bottom: 0;
+    position: relative;
+    vertical-align: middle;
+}
+.navbar-form .form-group p {
+    float: left;
+    font-weight: bold;
+    margin-right: 9px;
+    margin-top: 5px;
+}
+.navbar-form .form-control {
+   background: #ffffff none repeat scroll 0 0;
+    border: medium none;
+    border-radius: 40px;
+    box-shadow: none;
+    color: #cccccc;
+    display: inline-block;
+    padding: 5px 133px 5px 16px;
+    vertical-align: middle;
+    width: 362px;
+}
+.navbar-form .form-group .btn.btn-warning {
+    border: medium none;
+    border-radius: 40px;
+    height: 34px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.navbar-form.nav li {
+    float: left;
+    margin-bottom: 5px;
+    margin-right: 36px;
+    margin-top: 15px;
+}
+
+.navbar-form.nav li p.add {
+    float: left;
+    font-size: 15px;
+    font-weight: bold;
+    margin-right: 10px;
+    margin-top: 6px;
+}
 
 @media screen and (max-width:767px) {
 form.head-form{width:100%;}
