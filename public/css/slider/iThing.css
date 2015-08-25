@@ -1,9 +1,10 @@
 
 .ui-rangeSlider {
-    display: inline-block;
+   display: block;
     height: 34px;
+    margin: 0 auto;
     padding-top: 10px;
-    width: 312px;
+    width: 80%;
 }
 .ui-rangeSlider, .ui-rangeSlider-container, .ui-rangeSlider-arrow {
     box-sizing: content-box;
@@ -53,8 +54,8 @@
     border-left-color: #8792a2;
 }
 .ui-rangeSlider-rightArrow {
-    border-radius: 0 4px 4px 0;
-    border-right: 1px solid #515862;
+   
+    
 }
 .ui-rangeSlider-disabled .ui-rangeSlider-rightArrow {
     border-right-color: #8792a2;
@@ -126,8 +127,10 @@
     font-size: 11px;
     font-weight: bold;
     height: 20px;
-    padding: 2px 8px;
+    padding:2px 13px;
     z-index: 9999;
+     text-indent: 0;
+     line-height: 16px;
 }
 .ui-rangeSlider-label-inner {
     border-bottom: 10px solid #f47e1f;

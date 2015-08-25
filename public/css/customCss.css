@@ -2,6 +2,15 @@
 html, body{
   min-height: 100%;
 }
+
+body {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
 body{
   position: relative;
 }
@@ -35,20 +44,24 @@ body{
 .CustomData {
     width: 95%;
 }
-p.add{ color:#fff; margin-top: 14px; margin-bottom: 0px;}
+p.add {
+    color: #fff;
+    font-weight: bold;
+    line-height: 14px;
+    margin-bottom: 0;
+    margin-top: 14px;
+    text-indent: 0;
+}
 .btn.btn-warning{ background-color: #f47e1f;}
 .nav-bar-top{
     background:#1bb871;
     border-bottom:none;
-    -webkit-box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.1),4px 0px 15px 0px rgba(0, 0, 0, 0.3);
-    -moz-box-shadow: inset 0px 2px 2px 0px rgba(255,255,255,0.1),4px 0px 15px 0px rgba(0,0,0,0.3);
-    box-shadow: inset 0px 2px 2px 0px rgba(255, 255, 255, 0.1),4px 0px 15px 0px rgba(0, 0, 0, 0.3);
     }
 .navbar-inverse .navbar-brand{color:#fff;}
 form.head-form{padding:8px 0px; float:right;}
 form.head-form  input{width:300px !important; max-width:100% !important;}
 .navbar-brand.logo-brand.demo_logo {
-    margin-top: 15px;
+    margin-top: 6px;
 }
 .navbar-form .form-group {
     display: inline-block;
@@ -82,11 +95,11 @@ form.head-form  input{width:300px !important; max-width:100% !important;}
     top: 0;
 }
 .navbar-form.nav li {
-    float: left;
-    margin-bottom: 5px;
+     float: left;
+    margin-bottom: 0;
     margin-right: 36px;
-    margin-top: 15px;
-    width: 450px;
+    margin-top: 6px;
+ 
 }
 
 .navbar-form.nav li p.add {
@@ -110,6 +123,155 @@ form.head-form  input{width:300px !important; max-width:100% !important;}
 }
 .customLoader img {
     width: 101px;
+}
+
+/*!
+ * Start Bootstrap - Simple Sidebar HTML Template (http://startbootstrap.com)
+ * Code licensed under the Apache License v2.0.
+ * For details, see http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+/* Toggle Styles */
+
+#wrapper {
+    padding-left: 0;
+      margin-top: 64px;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled {
+    padding-right: 250px;
+}
+
+#sidebar-wrapper {
+    z-index: 1000;
+    position: fixed;
+    right: 250px;
+    width: 0;
+    height: 100%;
+    margin-right: -250px;
+    overflow-y: auto;
+    background: #1bb871;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    width: 250px;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    position: absolute;
+    padding: 15px;
+}
+
+#wrapper.toggled #page-content-wrapper {
+    position: absolute;
+    margin-right: -250px;
+}
+
+/* Sidebar Styles */
+
+.sidebar-nav {
+    position: absolute;
+    top: 0;
+    width: 250px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar-nav li {
+    text-indent: 20px;
+    line-height: 40px;
+    padding:20px;
+}
+
+.sidebar-nav li a {
+    display: block;
+    text-decoration: none;
+    color: #fff;
+}
+
+.sidebar-nav li a:hover {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255,255,255,0.2);
+}
+
+.sidebar-nav li a:active,
+.sidebar-nav li a:focus {
+    text-decoration: none;
+}
+
+.sidebar-nav > .sidebar-brand {
+    height: 65px;
+    font-size: 18px;
+    line-height: 60px;
+}
+
+.sidebar-nav > .sidebar-brand a {
+    color: #fff;
+}
+
+.sidebar-nav > .sidebar-brand a:hover {
+    color: #fff;
+    background: none;
+}
+
+.btn.btn-default .navbar-toggle.tog_menu {
+    display: block;
+}
+
+a.btn.btn-default {
+    background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+    border: medium none;
+    padding: 0;
+}
+a.btn.btn-default .navbar-toggle.tog_menu {
+    border: 1px solid #fff;
+    margin-top: 0;
+}
+a.btn.btn-default .navbar-toggle.tog_menu:hover {
+    background: #f47e1f none repeat scroll 0 0;
+   
+}
+a.btn.btn-default .navbar-toggle.tog_menu:focus {
+    background: #f47e1f none repeat scroll 0 0;
+   
+}
+@media(min-width:768px) {
+    #wrapper {
+        padding-right: 0px;
+    }
+
+    #wrapper.toggled {
+        padding-right: 250px;
+    }
+
+    #sidebar-wrapper {
+        width: 0px;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        width: 250px;
+    }
+
+    #page-content-wrapper {
+        padding: 0px;
+        position: relative;
+    }
+
+    #wrapper.toggled #page-content-wrapper {
+        position: relative;
+        margin-right: 0;
+    }
 }
 @media screen and (max-width:767px) {
 form.head-form{width:100%;}

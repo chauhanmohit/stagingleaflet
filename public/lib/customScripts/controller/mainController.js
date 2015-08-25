@@ -2,6 +2,14 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
     var geocoder = new google.maps.Geocoder();
     var canceller ;
     $scope.newPlaceAddress = 'Chicago' ;
+    $scope.search = {
+	'lat' : 41.8838113,
+	'lang' : -87.6317489,
+	'limit' : 500,
+	'from' : '2012-09-14',
+	'to' : '2012-12-25'
+     } ;
+
     /**
      *	using mapbox.js server tiles for the Map
      **/
@@ -9,14 +17,8 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
                 maxZoom: 21,
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors, Points &copy 2012 LINZ'
                         }),latlng = L.latLng(41.8838113, -87.6317489);
-    var map = L.map('map', {center: latlng, zoom: 16, layers: [tiles]});
-    var markers = L.markerClusterGroup({ chunkedLoading: true });
-    
-    /**
-     * On page load hit the method to get
-     * Data from api and show the map
-     **/
-    getData(map,markers);
+    $scope.map = L.map('map', {center: latlng, zoom: 16, layers: [tiles]});
+    $scope.markers = L.markerClusterGroup({ chunkedLoading: true });
     
     /**
      *  Get latlang on click of showlocation button
@@ -28,8 +30,10 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
             geocoder.geocode( { 'address': address}, function(results, status) {
                 if (status == google.maps.GeocoderStatus.OK) {
                     var pos = results[0].geometry.location ;
-                    map.panTo(new L.LatLng(pos.lat(), pos.lng()));
-                    getData(map,markers, pos.lat(), pos.lng());
+                    $scope.map.panTo(new L.LatLng(pos.lat(), pos.lng()));
+		    $scope.search.lat = pos.lat() ;
+		    $scope.search.lang = pos.lng();
+		    $scope.$apply();
                 } else {
                     alert("Geocode was not successful for the following reason: " + status);
                 }
@@ -43,43 +47,45 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
      *  to hit the api again
      **/
     
-    map.addEventListener('dragend',function(e){
-        var lat = e.target.getCenter().lat;
-        var lng = e.target.getCenter().lng;
-        var distance = e.distance ;
-        getData(map,markers,lat,lng, distance);
+    $scope.map.addEventListener('dragend',function(e){
+	$scope.search.lat = e.target.getCenter().lat;
+	$scope.search.lang = e.target.getCenter().lng;
+	$scope.search.limit = e.distance ;
+	$scope.$apply();
     });
-    
-    
+
     /**
      *	get the map Zoom changed event and
      *	get the Latlng to pass the getData
      *	method to hit the api again .
      **/
-    map.addEventListener('zoomend', function(e){
-	var lat = e.target.getCenter().lat;
-        var lng = e.target.getCenter().lng;
+    $scope.map.addEventListener('zoomend', function(e){
 	var ne = e.target.getBounds()._northEast ;
 	var center = {'lat':e.target.getCenter().lat, 'lng': e.target.getCenter().lng}
 	var distance = getDistance(center, ne);
-	getData(map,markers,lat,lng, distance);
+	$scope.search.lat = e.target.getCenter().lat;
+	$scope.search.lang = e.target.getCenter().lng;
+	$scope.search.limit = distance ;
+	$scope.$apply();
     });    
-
     
     /**
      *  function to get Data from Scorata Api 
      *  and resturn response as required
      **/
-    function getData(map,markers, lat, lng, limit, from, to){
+    $scope.getData = function (){
 
-        if ( typeof lat == undefined || !lat ) lat = 41.8838113  ;
-        if ( typeof lng == undefined || !lng ) lng = -87.6317489 ;
-        if (typeof limit == undefined || !limit ) limit = 500 ;
-	if (typeof from == undefined || !from) from = '2012-09-14' ;
-	if (typeof to == undefined || !to) to = '2012-12-25';
+        if (typeof $scope.search.lat == undefined || !$scope.search.lat ) $scope.search.lat = 41.8838113  ;
+        if (typeof $scope.search.lang == undefined || !$scope.search.lang ) $scope.search.lang = -87.6317489 ;
+        if (typeof $scope.search.limit == undefined || !$scope.search.limit ) $scope.search.limit = 500 ;
+	if (typeof $scope.search.from == undefined || !$scope.search.from) $scope.search.from = '2012-09-14' ;
+	if (typeof $scope.search.to == undefined || !$scope.search.to) $scope.search.to = '2012-12-25';
 	if (canceller) canceller.resolve("User Intrupt");
+	
 	//creating the defered object
+	
 	canceller = $q.defer();
+	$scope.removeOldMarkers();
 	$scope.showLoder = true ;
 	var LeafIcon = L.Icon.extend({
 					options: {
@@ -94,16 +100,17 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 			purpleIcon = new LeafIcon({iconUrl: '/map-icon/mark4.png'}),
 			defaultIcon = new LeafIcon({iconUrl: '/map-icon/marker-icon.png'});
     
-        $http.get('/api/web/data.json?lat='+lat+'&lang='+lng+'&limit='+limit+'&from='+from+'&to='+to , { timeout: canceller.promise })
+        $http.get('/api/web/data.json?lat='+$scope.search.lat+'&lang='+$scope.search.lang+'&limit='+$scope.search.limit+'&from='+$scope.search.from+'&to='+$scope.search.to , { timeout: canceller.promise })
         .success(function(res,status,config,header){
             for (var i = 0; i < res.length; i++) {
                 var response = getContent(res[i]);
 		var image = res[i].primary_type == 'ASSAULT' ? redIcon : res[i].primary_type == 'NARCOTICS' ? orangeIcon : res[i].primary_type == 'BATTERY' ? purpleIcon : res[i].primary_type == 'BATTERY' ? defaultIcon: greenIcon ;
                 var marker = L.marker(new L.LatLng(res[i].latitude, res[i].longitude),{icon: image});
                 marker.bindPopup(response);
-                markers.addLayer(marker);
+		if (marker !== null) $scope.markers.removeLayer(marker);
+                $scope.markers.addLayer(marker);
             }
-            map.addLayer(markers);
+            $scope.map.addLayer($scope.markers);
 	    $scope.showLoder = false ;
 	}).error(function(err,status,config,header){
 	    $scope.showLoder = false ;
@@ -114,6 +121,14 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	});
     }
     
+    /**
+     * remove all the previous markers from
+     * the map before loading new markers
+     **/
+    
+    $scope.removeOldMarkers = function(){
+	$scope.markers.clearLayers();
+    }
     
     /**
      *  Customized the data for the onclick
@@ -186,7 +201,16 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	var t = new Date(data.values.max);
 	var from = f.toISOString().slice(0,10);
 	var to = t.toISOString().slice(0,10);
-	var lat,lng,limit ;
-	getData(map,markers, lat, lng, limit, from, to);
+	$scope.search.from = from ;
+	$scope.search.to = to ;
+	$scope.$apply();
     });
+    
+    // watcher for  search change
+    $scope.$watchCollection('search' , function(n,o){
+	    if(n !== o ){
+		$scope.getData();
+	    }
+    });
+    
 }]);
