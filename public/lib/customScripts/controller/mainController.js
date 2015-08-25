@@ -85,7 +85,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	if (canceller) canceller.resolve("User Intrupt");
 	
 	//creating the defered object
-	
+	 
 	canceller = $q.defer();
 	$scope.showLoder = true ;
 	var LeafIcon = L.Icon.extend({
@@ -212,9 +212,9 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
     
     // watcher for  search change
     $scope.$watchCollection('search' , function(n,o){
-	    if(n !== o ){
-		$scope.getData();
-	    }
+	if(n !== o ){
+	    $scope.getData();
+	}
     });
     
-}]);
+}]); 

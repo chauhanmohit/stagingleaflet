@@ -9,7 +9,7 @@ require 'soda/client'
 
 
 # get ALL posts
-get "/" do
+get "/" do 
   erb :"posts/index"
 end
 
@@ -58,7 +58,6 @@ get "/api/web/data.json" do
       @message.to_json 
     end
 end
-
 
 
 # for mobile user to hit the api
