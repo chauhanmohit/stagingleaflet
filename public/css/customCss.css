@@ -191,6 +191,7 @@ form.head-form  input{width:300px !important; max-width:100% !important;}
     text-indent: 20px;
     line-height: 40px;
     padding:20px;
+    color: #fff;
 }
 
 .sidebar-nav li a {

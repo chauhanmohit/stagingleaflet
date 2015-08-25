@@ -13,7 +13,7 @@ get "/" do
   erb :"posts/index"
 end
 
-## for desktop or web user to hit the api
+## for desktop or web user to hit the api for post request
 #post "/api/web/data.json" do
 #  content_type :json
 #    request.body.rewind
@@ -24,28 +24,34 @@ end
 #    @limit = req['data']['limit']
 #    @from = req['data']['from']
 #    @to = req['data']['to']
-#    
+#    @type = req['data']['type']
+#    @arrest = req['data']['arrest']
+#
 #    if @lat && @lang && @limit
 #      client = SODA::Client.new({ :domain => 'data.cityofchicago.org', :app_token => 'v1SkHrbzQcyFmlkL9D5W1UXfT' })
-#      response = client.get('6zsd-86xi', {"$where" => "within_circle(location, #{@lat}, #{@lang}, #{@limit}) AND date > '#{@from}' AND date < '#{@to}' ","$limit"=>"200" })
+#      response = client.get('6zsd-86xi', {"$where" => "within_circle(location, #{@lat}, #{@lang}, #{@limit}) AND date > '#{@from}' AND date < '#{@to}' ","$limit"=>"200","primary_type"=>"#{@type}","arrest"=>"#{@arrest}" })
 #      response.to_json 
 #    else
 #      @message ='{ "Error": { "status":400 , "message":"Please Specifiy the location co-ordinates and data limit" } }'
 #      @message.to_json 
 #    end
 #end
+
+## for desktop or web user to hit the api for get request
 get "/api/web/data.json" do
   content_type :json
-  
+ 
     @lat = params[:lat]
     @lang = params[:lang]
     @limit = params[:limit]
     @from = params[:from]
     @to = params[:to]
+    @type = params[:type]
+    @arrest = params[:arrest]
 
     if @lat && @lang && @limit
       client = SODA::Client.new({ :domain => 'data.cityofchicago.org', :app_token => 'v1SkHrbzQcyFmlkL9D5W1UXfT' })
-      response = client.get('6zsd-86xi', {"$where" => "within_circle(location, #{@lat}, #{@lang}, #{@limit}) AND date > '#{@from}' AND date < '#{@to}' ","$limit"=>"500" })
+      response = client.get('6zsd-86xi', {"$where" => "within_circle(location, #{@lat}, #{@lang}, #{@limit}) AND date > '#{@from}' AND date < '#{@to}' ","$limit"=>"200","primary_type"=>"#{@type}","arrest"=>"#{@arrest}" })
       response.to_json 
     else
       @message ='{ "Error": { "status":400 , "message":"Please Specifiy the location co-ordinates and data limit" } }'

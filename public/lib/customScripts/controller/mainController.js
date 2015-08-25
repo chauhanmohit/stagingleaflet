@@ -7,7 +7,9 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	'lang' : -87.6317489,
 	'limit' : 500,
 	'from' : '2012-09-14',
-	'to' : '2012-12-25'
+	'to' : '2012-12-25',
+	'type': 'THEFT',
+	'arrest': 'true', 
      } ;
 
     /**
@@ -85,7 +87,6 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	//creating the defered object
 	
 	canceller = $q.defer();
-	$scope.removeOldMarkers();
 	$scope.showLoder = true ;
 	var LeafIcon = L.Icon.extend({
 					options: {
@@ -99,12 +100,15 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 			orangeIcon = new LeafIcon({iconUrl: '/map-icon/mark3.png'}),
 			purpleIcon = new LeafIcon({iconUrl: '/map-icon/mark4.png'}),
 			defaultIcon = new LeafIcon({iconUrl: '/map-icon/marker-icon.png'});
-    
-        $http.get('/api/web/data.json?lat='+$scope.search.lat+'&lang='+$scope.search.lang+'&limit='+$scope.search.limit+'&from='+$scope.search.from+'&to='+$scope.search.to , { timeout: canceller.promise })
+			
+	//$http.post('/api/web/data.json', { 'data': $scope.search })
+        $http.get('/api/web/data.json?lat='+$scope.search.lat+'&lang='+$scope.search.lang+'&limit='+$scope.search.limit+'&from='+$scope.search.from+'&to='+$scope.search.to+'&type='+$scope.search.type+'&arrest='+$scope.search.arrest ,
+	{ timeout: canceller.promise })
         .success(function(res,status,config,header){
+	    $scope.removeOldMarkers();
             for (var i = 0; i < res.length; i++) {
                 var response = getContent(res[i]);
-		var image = res[i].primary_type == 'ASSAULT' ? redIcon : res[i].primary_type == 'NARCOTICS' ? orangeIcon : res[i].primary_type == 'BATTERY' ? purpleIcon : res[i].primary_type == 'BATTERY' ? defaultIcon: greenIcon ;
+		var image = res[i].primary_type == 'ASSAULT' ? redIcon : res[i].primary_type == 'ROBBERY' ? orangeIcon : res[i].primary_type == 'BATTERY' ? purpleIcon : res[i].primary_type == 'BATTERY' ? defaultIcon: greenIcon ;
                 var marker = L.marker(new L.LatLng(res[i].latitude, res[i].longitude),{icon: image});
                 marker.bindPopup(response);
 		if (marker !== null) $scope.markers.removeLayer(marker);
@@ -170,7 +174,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
                                 '</div>'+
                                 '<div class="row">'+
                                     '<div class="col-sm-6"><strong>Year</strong>:</div>'+
-                                    '<div class="col-sm-3">'+ data.arrest + '</div>'+
+                                    '<div class="col-sm-3">'+ data.year + '</div>'+
                                 '</div>'+
                             '</div>';
 	return infoData ;

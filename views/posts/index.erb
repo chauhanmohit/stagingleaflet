@@ -56,13 +56,23 @@
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
-                    
+                    Filters
                 </li>
                 <li>
-                    <p class="add">Date</p> <div id="slider"></div>
+                    <p class="add">Time line</p>
+                    <div id="slider"></div>
                 </li>
                 <li>
-                    <a href="#">Shortcuts</a>
+                 <p class="add">Crime Type</p>
+                 <input type="radio" name="type" ng-model="search.type" value="THEFT" />&nbsp; Theft  <br/>
+                 <input type="radio" name="type" ng-model="search.type" value="ASSAULT" />&nbsp; Assault <br/>
+                 <input type="radio" name="type" ng-model="search.type" value="BATTERY"/>&nbsp; Battery <br/>
+                 <input type="radio" name="type" ng-model="search.type" value="ROBBERY" />&nbsp; Robbery <br/>
+                </li>
+                <li>
+                <p class="add">Arrest</p>
+                 <input type="radio" name="arrest" ng-model="search.arrest" value="true" />&nbsp; Yes <br/>
+                 <input type="radio" name="arrest" ng-model="search.arrest" value="false" />&nbsp; No <br/>
                 </li>
                
             </ul>
