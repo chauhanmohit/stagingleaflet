@@ -179,7 +179,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
                             '</div>';
 	return infoData ;
     }
-    
+      
     rad = function(x) {
     	return x * Math.PI / 180;
     };

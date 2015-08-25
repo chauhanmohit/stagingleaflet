@@ -67,7 +67,7 @@ get "/api/mobile/data.json" do
   
     @lat = params[:lat]
     @lang = params[:lang]
-    @limit = params[:limit]
+    @limit = params[:limit]     
     @from = params[:from]
     @to = params[:to]
     @datalimit = params[:datalimit]
