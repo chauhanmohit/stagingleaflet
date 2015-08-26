@@ -18,9 +18,11 @@
                                        <ul class="navbar-form nav navbar navbar-right">
                                           <li>
                                             <div class="form-group">
-                                              <p class="add">Address</p>
-                                              <input type="text" class="form-control" ng-model="newPlaceAddress" class="form-control" />
-                                              <button class="btn btn-warning" ng-click="getAddress()">Show Location</button>
+                                              <form novalidate ng-submit="getAddress()" >
+                                                   <p class="add">Address</p>
+                                                   <input type="text" class="form-control" ng-model="newPlaceAddress" class="form-control" />
+                                                   <input type="submit" class="btn btn-warning" value="Show Location" ng-disabled="changePasswordForm.$invalid" />
+                                              </form>
                                             </div>
                                            </li>
                                         <!--  <li>  <p class="add">Date</p> <div id="slider"></div></li> -->

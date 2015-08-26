@@ -43,23 +43,23 @@ get "/api/web/data.json" do
  
     @lat = params[:lat]
     @lang = params[:lang]
-    @limit = params[:limit]
+    @radius = params[:radius]
     @from = params[:from]
     @to = params[:to]
     @type = params[:type]
     @arrest = params[:arrest]
     crimeType = params[:type].split(',')
 
-    if @lat && @lang && @limit
+    if @lat && @lang && @radius
       client = SODA::Client.new({ :domain => 'data.cityofchicago.org', :app_token => 'v1SkHrbzQcyFmlkL9D5W1UXfT' })
       response = client.get('6zsd-86xi',
                               {
-                              "$where" => "within_circle(location, #{@lat}, #{@lang}, #{@limit}) AND
+                              "$where" => "within_circle(location, #{@lat}, #{@lang}, #{@radius}) AND
                                            date > '#{@from}' AND date < '#{@to}' And
                                            (primary_type = '#{crimeType[0]}' OR primary_type = '#{crimeType[1]}'
                                              OR primary_type = '#{crimeType[2]}' OR primary_type = '#{crimeType[3]}'
                                             )",
-                              "$limit"=>"200",
+                              "$limit"=>"500",
                               "arrest"=>"#{@arrest}",
                               }
                             )

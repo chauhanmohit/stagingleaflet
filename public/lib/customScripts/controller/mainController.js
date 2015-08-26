@@ -6,7 +6,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
     $scope.search = {
 	'lat' : 41.8838113,
 	'lang' : -87.6317489,
-	'limit' : 500,
+	'radius' : 500,
 	'from' : '2012-09-14',
 	'to' : '2012-12-25',
 	'type': ["THEFT","ASSAULT","BATTERY","ROBBERY"],
@@ -21,6 +21,13 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors, Points &copy 2012 LINZ'
                         }),latlng = L.latLng(41.8838113, -87.6317489);
     $scope.map = L.map('map', {center: latlng, zoom: 16, layers: [tiles]});
+//    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhdWhhbm1vaGl0IiwiYSI6IjE0YTljYTgyY2IzNDVlMmI0MTZhNzMwOGRkMzI4MGY3In0.vNQxFF8XYPTbbjm7fD72mg';
+//    $scope.map = new mapboxgl.Map({
+//				    container: 'map', // container id
+//				    style: 'https://www.mapbox.com/mapbox-gl-styles/styles/outdoors-v7.json', //stylesheet location
+//				    center: [41.8838113, -87.6317489], // starting position
+//				    zoom: 16 // starting zoom
+//				});
     $scope.markers = L.markerClusterGroup({ chunkedLoading: true });
     
     /**
@@ -50,10 +57,10 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
      *  to hit the api again
      **/
     
-    $scope.map.addEventListener('dragend',function(e){
+    $scope.map.on('dragend',function(e){
 	$scope.search.lat = e.target.getCenter().lat;
 	$scope.search.lang = e.target.getCenter().lng;
-	$scope.search.limit = e.distance ;
+	$scope.search.radius = e.distance ;
 	$scope.$apply();
     });
 
@@ -62,13 +69,13 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
      *	get the Latlng to pass the getData
      *	method to hit the api again .
      **/
-    $scope.map.addEventListener('zoomend', function(e){
+    $scope.map.on('zoomend', function(e){
 	var ne = e.target.getBounds()._northEast ;
 	var center = {'lat':e.target.getCenter().lat, 'lng': e.target.getCenter().lng}
 	var distance = getDistance(center, ne);
 	$scope.search.lat = e.target.getCenter().lat;
 	$scope.search.lang = e.target.getCenter().lng;
-	$scope.search.limit = distance ;
+	$scope.search.radius = distance ;
 	$scope.$apply();
     });    
     
@@ -80,7 +87,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 
         if (typeof $scope.search.lat == undefined || !$scope.search.lat ) $scope.search.lat = 41.8838113  ;
         if (typeof $scope.search.lang == undefined || !$scope.search.lang ) $scope.search.lang = -87.6317489 ;
-        if (typeof $scope.search.limit == undefined || !$scope.search.limit ) $scope.search.limit = 500 ;
+        if (typeof $scope.search.radius == undefined || !$scope.search.radius ) $scope.search.radius = 500 ;
 	if (typeof $scope.search.from == undefined || !$scope.search.from) $scope.search.from = '2012-09-14' ;
 	if (typeof $scope.search.to == undefined || !$scope.search.to) $scope.search.to = '2012-12-25';
 	if (canceller) canceller.resolve("User Intrupt");
@@ -103,7 +110,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 			defaultIcon = new LeafIcon({iconUrl: '/map-icon/marker-icon.png'});
 			
 	//$http.post('/api/web/data.json', { 'data': $scope.search })
-        $http.get('/api/web/data.json?lat='+$scope.search.lat+'&lang='+$scope.search.lang+'&limit='+$scope.search.limit+'&from='+$scope.search.from+'&to='+$scope.search.to+'&type='+$scope.search.type+'&arrest='+$scope.search.arrest ,
+        $http.get('/api/web/data.json?lat='+$scope.search.lat+'&lang='+$scope.search.lang+'&radius='+$scope.search.radius+'&from='+$scope.search.from+'&to='+$scope.search.to+'&type='+$scope.search.type+'&arrest='+$scope.search.arrest ,
 	{ timeout: canceller.promise })
         .success(function(res,status,config,header){
 	    $scope.removeOldMarkers();
