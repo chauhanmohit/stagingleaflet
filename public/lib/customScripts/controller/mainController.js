@@ -9,7 +9,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	'limit' : 500,
 	'from' : '2012-09-14',
 	'to' : '2012-12-25',
-	'type': ["THEFT","ASSAULT","BATTERY","ROBBERY","MURDER"],
+	'type': ["THEFT","ASSAULT","BATTERY","ROBBERY"],
 	'arrest': 'true', 
      } ;
 
