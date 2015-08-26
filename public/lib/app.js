@@ -1,1 +1,1 @@
-var app = angular.module('AngularJsApp', []);
+var app = angular.module('AngularJsApp', ["checklist-model"]);

@@ -2,13 +2,14 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
     var geocoder = new google.maps.Geocoder();
     var canceller ;
     $scope.newPlaceAddress = 'Chicago' ;
+    $scope.crimeType = ["THEFT","ASSAULT","BATTERY","ROBBERY"] ;
     $scope.search = {
 	'lat' : 41.8838113,
 	'lang' : -87.6317489,
 	'limit' : 500,
 	'from' : '2012-09-14',
 	'to' : '2012-12-25',
-	'type': 'THEFT',
+	'type': ["THEFT","ASSAULT","BATTERY","ROBBERY","MURDER"],
 	'arrest': 'true', 
      } ;
 
@@ -212,6 +213,12 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
     
     // watcher for  search change
     $scope.$watchCollection('search' , function(n,o){
+	if(n !== o ){
+	    $scope.getData();
+	}
+    });
+    
+    $scope.$watchCollection('search.type' , function(n,o){
 	if(n !== o ){
 	    $scope.getData();
 	}

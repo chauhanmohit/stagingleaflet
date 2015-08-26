@@ -59,10 +59,13 @@
                 </li>
                 <li>
                  <p class="add">Crime Type</p>
-                 <input type="radio" name="type" ng-model="search.type" value="THEFT" />&nbsp; Theft  <br/>
-                 <input type="radio" name="type" ng-model="search.type" value="ASSAULT" />&nbsp; Assault <br/>
-                 <input type="radio" name="type" ng-model="search.type" value="BATTERY"/>&nbsp; Battery <br/>
-                 <input type="radio" name="type" ng-model="search.type" value="ROBBERY" />&nbsp; Robbery <br/>
+                 <table>
+                     <tr ng-repeat="data in crimeType">
+                          <td>
+                              <input type="checkbox" checklist-model="search.type" checklist-value="data"> {{data}} 
+                          </td>
+                     </tr>
+                 </table>
                 </li>
                 <li>
                 <p class="add">Arrest</p>

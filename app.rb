@@ -48,10 +48,21 @@ get "/api/web/data.json" do
     @to = params[:to]
     @type = params[:type]
     @arrest = params[:arrest]
+    crimeType = params[:type].split(',')
 
     if @lat && @lang && @limit
       client = SODA::Client.new({ :domain => 'data.cityofchicago.org', :app_token => 'v1SkHrbzQcyFmlkL9D5W1UXfT' })
-      response = client.get('6zsd-86xi', {"$where" => "within_circle(location, #{@lat}, #{@lang}, #{@limit}) AND date > '#{@from}' AND date < '#{@to}' ","$limit"=>"200","primary_type"=>"#{@type}","arrest"=>"#{@arrest}" })
+      response = client.get('6zsd-86xi',
+                              {
+                              "$where" => "within_circle(location, #{@lat}, #{@lang}, #{@limit}) AND
+                                           date > '#{@from}' AND date < '#{@to}' And
+                                           (primary_type = '#{crimeType[0]}' OR primary_type = '#{crimeType[1]}'
+                                             OR primary_type = '#{crimeType[2]}' OR primary_type = '#{crimeType[3]}'
+                                            )",
+                              "$limit"=>"200",
+                              "arrest"=>"#{@arrest}",
+                              }
+                            )
       response.to_json 
     else
       @message ='{ "Error": { "status":400 , "message":"Please Specifiy the location co-ordinates and data limit" } }'
