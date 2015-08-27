@@ -1,7 +1,7 @@
 app.controller('mainController',['$scope','$http','$q','$timeout',function($scope,$http,$q,$timeout){
     var geocoder = new google.maps.Geocoder();
     var canceller ;
-    $scope.newPlaceAddress = 'Chicago' ;
+    $scope.newPlaceAddress = '' ;
     $scope.crimeType = ["THEFT","ASSAULT","BATTERY","ROBBERY"] ;
     $scope.search = {
 	'lat' : 41.8838113,
@@ -33,9 +33,10 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
             geocoder.geocode( { 'address': address}, function(results, status) {
                 if (status == google.maps.GeocoderStatus.OK) {
                     var pos = results[0].geometry.location ;
-                    $scope.map.panTo(new L.LatLng(pos.lat(), pos.lng()));
 		    $scope.search.lat = pos.lat() ;
 		    $scope.search.lang = pos.lng();
+                    $scope.map.panTo(new L.LatLng(pos.lat(), pos.lng()));
+		    $scope.map.setZoom(16);
 		    $scope.$apply();
                 } else {
                     alert("Geocode was not successful for the following reason: " + status);
