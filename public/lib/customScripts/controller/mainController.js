@@ -60,7 +60,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
     $scope.map.on('dragend',function(e){
 	$scope.search.lat = e.target.getCenter().lat;
 	$scope.search.lang = e.target.getCenter().lng;
-	$scope.search.radius = e.distance ;
+	$scope.search.radius = e.distance < 1000 ? e.distance = 1000 : e.distance ;
 	$scope.$apply();
     });
 
@@ -75,7 +75,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	var distance = getDistance(center, ne);
 	$scope.search.lat = e.target.getCenter().lat;
 	$scope.search.lang = e.target.getCenter().lng;
-	$scope.search.radius = distance ;
+	$scope.search.radius = distance < 1000 ? distance = 1000 : distance ;
 	$scope.$apply();
     });    
     
