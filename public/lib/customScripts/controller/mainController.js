@@ -76,7 +76,6 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
      *	get the radius according to the viewport
      *	on initial map load
      **/
-    
     $scope.getRadiusOnLoad = function(){
 	var ne = $scope.map.getBounds()._northEast ;
 	var pos = $scope.map.getCenter();

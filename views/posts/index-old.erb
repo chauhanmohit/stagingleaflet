@@ -5,16 +5,22 @@
 <nav class="navbar navbar-inverse nav-bar-top navbar-fixed-top">
                <div class="container-fluid">
                                   <div class="navbar-header">
-                                                <a class="navbar-brand logo-brand demo_logo" href="#">Angular Demo App</a>
+                                                  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                                                                  <span class="sr-only">Toggle navigation</span>
+                                                                  <span class="icon-bar"></span>
+                                                                  <span class="icon-bar"></span>
+                                                                  <span class="icon-bar"></span>
+                                                  </button>
+                                                  <a class="navbar-brand logo-brand demo_logo" href="#">Angular Demo App</a>
                                   </div>
                                                                                                     
-                                  <div id="navbar" class="navbar-collapse ">
+                                  <div id="navbar" class="navbar-collapse collapse">
                                        <ul class="navbar-form nav navbar navbar-right">
-                                          <li class="src_rw_lst">
+                                          <li>
                                             <div class="form-group">
                                               <form novalidate ng-submit="getAddress()" >
                                                    <p class="add">Address</p>
-                                                   <input type="text" class="form-control" placeholder="Chicago" class="form-control"  />
+                                                   <input type="text" class="form-control" placeholder="Chicago" class="form-control" />
                                                    <input type="submit" class="btn btn-warning" value="Show Location" ng-disabled="changePasswordForm.$invalid" />
                                               </form>
                                             </div>
@@ -46,25 +52,8 @@
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
-	       <li>
-		  <div id="navbar" class="navbar-collapse collapse mobile_div">
-                                       <ul class="navbar-form nav navbar navbar-right">
-                                          <li>
-                                            <div class="form-group">
-                                              <form novalidate ng-submit="getAddress()" >
-                                                   <p class="add">Address</p>
-                                                   <input type="text" class="form-control" ng-model="newPlaceAddress" class="form-control" placeholder="Enter Address" />
-                                                   <input type="submit" class="btn btn-warning" value="Show Location" ng-disabled="changePasswordForm.$invalid" />
-                                              </form>
-                                            </div>
-                                           </li>
-                                        
-                                       </ul>
-                                  </div>	
-	       </li>
-	    
                 <li class="sidebar-brand">
-                  Filters
+                    Filters
                 </li>
                 <li>
                     <p class="add">Time line</p>
@@ -75,14 +64,14 @@
                  <table>
                      <tr ng-repeat="data in crimeType">
                           <td>
-                             <label> <input type="checkbox" checklist-model="search.type" checklist-value="data"> {{data}} </label>
+                              <input type="checkbox" checklist-model="search.type" checklist-value="data"> {{data}} 
                           </td>
                      </tr>
                  </table>
                 </li>
                 <li>
                 <p class="add">Arrest</p>
-                 <input type="radio" name="arrest" ng-model="search.arrest" value="true" />&nbsp; Yes &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+                 <input type="radio" name="arrest" ng-model="search.arrest" value="true" />&nbsp; Yes <br/>
                  <input type="radio" name="arrest" ng-model="search.arrest" value="false" />&nbsp; No <br/>
                 </li>
                
@@ -109,14 +98,5 @@
         e.preventDefault();
         $("#wrapper").toggleClass("toggled");
     });
-    
-    $(function () {
-    $('input,textarea').focus(function () {
-        $(this).data('placeholder', $(this).attr('placeholder'))
-               .attr('placeholder', '');
-    }).blur(function () {
-        $(this).attr('placeholder', $(this).data('placeholder'));
-    });
-});
  </script>
     
