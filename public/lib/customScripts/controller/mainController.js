@@ -19,15 +19,8 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
     var tiles = L.tileLayer('http://{s}.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiY2hhdWhhbm1vaGl0IiwiYSI6IjE0YTljYTgyY2IzNDVlMmI0MTZhNzMwOGRkMzI4MGY3In0.vNQxFF8XYPTbbjm7fD72mg',{
                 maxZoom: 21,
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors, Points &copy 2012 LINZ'
-                        }),latlng = L.latLng(41.8838113, -87.6317489);
+                        }),latlng = L.latLng($scope.search.lat, $scope.search.lang);
     $scope.map = L.map('map', {center: latlng, zoom: 16, layers: [tiles]});
-//    mapboxgl.accessToken = 'pk.eyJ1IjoiY2hhdWhhbm1vaGl0IiwiYSI6IjE0YTljYTgyY2IzNDVlMmI0MTZhNzMwOGRkMzI4MGY3In0.vNQxFF8XYPTbbjm7fD72mg';
-//    $scope.map = new mapboxgl.Map({
-//				    container: 'map', // container id
-//				    style: 'https://www.mapbox.com/mapbox-gl-styles/styles/outdoors-v7.json', //stylesheet location
-//				    center: [41.8838113, -87.6317489], // starting position
-//				    zoom: 16 // starting zoom
-//				});
     $scope.markers = L.markerClusterGroup({ chunkedLoading: true });
     
     /**
@@ -77,14 +70,29 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	$scope.search.lang = e.target.getCenter().lng;
 	$scope.search.radius = distance < 1000 ? distance = 1000 : distance ;
 	$scope.$apply();
-    });    
+    });
+    
+    /**
+     *	get the radius according to the viewport
+     *	on initial map load
+     **/
+    
+    $scope.getRadiusOnLoad = function(){
+	var ne = $scope.map.getBounds()._northEast ;
+	var pos = $scope.map.getCenter();
+	var center = {'lat':pos.lat, 'lng': pos.lng}
+	var distance = getDistance(center, ne);
+	var cal = parseFloat((distance*10)/100) ;
+	var radius = parseFloat(distance + cal) ;
+	$scope.search.radius = radius ;
+    }
     
     /**
      *  function to get Data from Scorata Api 
      *  and resturn response as required
      **/
     $scope.getData = function (){
-
+	$scope.getRadiusOnLoad();
         if (typeof $scope.search.lat == undefined || !$scope.search.lat ) $scope.search.lat = 41.8838113  ;
         if (typeof $scope.search.lang == undefined || !$scope.search.lang ) $scope.search.lang = -87.6317489 ;
         if (typeof $scope.search.radius == undefined || !$scope.search.radius ) $scope.search.radius = 500 ;
