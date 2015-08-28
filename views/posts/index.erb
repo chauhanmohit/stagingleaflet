@@ -62,7 +62,6 @@
                                        </ul>
                                   </div>	
 	       </li>
-	    
                 <li class="sidebar-brand">
                   Filters
                 </li>
@@ -70,7 +69,7 @@
                     <p class="add">Time line</p>
                     <div id="slider"></div>
                 </li>
-                <li>
+                <li class="crm_type">
                  <p class="add">Crime Type</p>
                  <table>
                      <tr ng-repeat="data in crimeType">
@@ -80,10 +79,32 @@
                      </tr>
                  </table>
                 </li>
-                <li>
+   <!--             <li>
                 <p class="add">Arrest</p>
                  <input type="radio" name="arrest" ng-model="search.arrest" value="true" />&nbsp; Yes &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
                  <input type="radio" name="arrest" ng-model="search.arrest" value="false" />&nbsp; No <br/>
+                </li>    -->
+                <li>
+                                  <table class="table table-hovered" >
+                                      <thead>
+                                       <tr>
+                                         <th class="col-xs-2">Crime Type</th>
+                                         <th class="col-xs-2">Arrest</th>
+                                         <!-- <th>Case Number</th> -->
+                                         <th class="col-xs-6">Description</th>
+                                         <th class="col-xs-2">Date</th>
+                                      </tr>
+                                      </thead>
+                                  <tbody>
+                                      <tr ng-repeat="info in serverData">
+                                         <td class="col-xs-2"><b>{{info.primary_type}}</b></td>
+                                         <td class="col-xs-2">{{info.arrest}}</td>
+                                         <!--<td>{{info.case_number}}</td> -->
+                                         <td class="col-xs-6">{{info.description}}</td>
+                                          <td class="col-xs-2">{{info.date | date:'mediumDate'}}</td>
+                                      </tr>
+                                   </tbody>
+                                  </table>
                 </li>
                
             </ul>  

@@ -21,8 +21,8 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors, Points &copy 2012 LINZ'
                         }),latlng = L.latLng($scope.search.lat, $scope.search.lang);
     $scope.map = L.map('map', {center: latlng, zoom: 16, layers: [tiles]});
-    $scope.markers = L.markerClusterGroup({ chunkedLoading: true });
-    
+    $scope.markers = L.markerClusterGroup({ chunkedLoading: true , disableClusteringAtZoom: 18 });
+    {  }
     /**
      *  Get latlang on click of showlocation button
      *  and show the location on map.
@@ -122,6 +122,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	{ timeout: canceller.promise })
         .success(function(res,status,config,header){
 	    $scope.removeOldMarkers();
+	    $scope.serverData = res ;
             for (var i = 0; i < res.length; i++) {
                 var response = getContent(res[i]);
 		var image = res[i].primary_type == 'ASSAULT' ? redIcon : res[i].primary_type == 'ROBBERY' ? orangeIcon : res[i].primary_type == 'BATTERY' ? purpleIcon : res[i].primary_type == 'BATTERY' ? defaultIcon: greenIcon ;
