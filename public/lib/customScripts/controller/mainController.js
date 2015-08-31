@@ -22,7 +22,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
                         }),latlng = L.latLng($scope.search.lat, $scope.search.lang);
     $scope.map = L.map('map', {center: latlng, zoom: 16, layers: [tiles]});
     $scope.markers = L.markerClusterGroup({ chunkedLoading: true , disableClusteringAtZoom: 18 });
-    {  }
+
     /**
      *  Get latlang on click of showlocation button
      *  and show the location on map.

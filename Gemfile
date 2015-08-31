@@ -1,7 +1,8 @@
 # Gemfile
 
 source 'https://rubygems.org'
-ruby "1.9.3"
+#ruby "1.9.3"
+ruby "2.2.1"
 
 gem "sinatra"
 gem 'rest-open-uri'
