@@ -257,7 +257,7 @@ form.head-form input {
 .sidebar-nav li table.table tbody {
     background: #fff none repeat scroll 0 0;
     color: #333;
-    height: 217px;
+    max-height: 217px;
     overflow-x: hidden;
     overflow-y: auto;
 }

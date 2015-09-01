@@ -123,6 +123,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
         .success(function(res,status,config,header){
 	    $scope.removeOldMarkers();
 	    $scope.serverData = res ;
+	    console.log("data limit is", res.length															);
             for (var i = 0; i < res.length; i++) {
                 var response = getContent(res[i]);
 		var image = res[i].primary_type == 'ASSAULT' ? redIcon : res[i].primary_type == 'ROBBERY' ? orangeIcon : res[i].primary_type == 'BATTERY' ? purpleIcon : res[i].primary_type == 'BATTERY' ? defaultIcon: greenIcon ;

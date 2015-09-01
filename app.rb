@@ -47,7 +47,7 @@ get "/api/web/data.json" do
     @from = params[:from]
     @to = params[:to]
     @type = params[:type]
-    @arrest = params[:arrest]
+    @arrest = params[:arrest] ? params[:arrest] : true ;
     crimeType = params[:type].split(',')
 
     if @lat && @lang && @radius
@@ -59,7 +59,7 @@ get "/api/web/data.json" do
                                            (primary_type = '#{crimeType[0]}' OR primary_type = '#{crimeType[1]}'
                                              OR primary_type = '#{crimeType[2]}' OR primary_type = '#{crimeType[3]}'
                                             )",
-                              "$limit"=>"500",
+                              "$limit"=>"1000",
                               "arrest"=>"#{@arrest}",
                               }
                             )
