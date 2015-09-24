@@ -8,7 +8,7 @@ gem "sinatra"
 gem 'rest-open-uri'
 gem 'json'
 gem 'soda-ruby', :require => 'soda'
- 
+gem 'parallel'
 #group :development do
 #  gem 'sqlite3'
 #  gem "tux"

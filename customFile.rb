@@ -1,20 +1,11 @@
-# app.rb
-
-require 'sinatra'
-require 'json'
-require './environments'
-require 'soda/client'
-require 'parallel'
-#enable :sessions
-
 class Lib
   
-  def data(lat,lang,radius,zoom)
+  def dta(lat,lang,radius,zoom)
       if lat && lang && radius && zoom
-          if zoom.to_i < 11
-            @response = getDataSet(lat,lang,radius)
+          if zoom > '10' 
+            @response = multiProcess(lat,lang,radius)
           else
-            @response = multiProcess(lat,lang,radius) 
+            @response = getDataSet(lat,lang,radius)
           end
         return @response
         #respond_to do |format|
@@ -27,10 +18,10 @@ class Lib
         #end 
       end
   end
-  
+    
+    
   def multiProcess(lat,lang,radius)
-    @data = Array.new
-    Parallel.map([testEndPoint(lat,lang,radius), testEndPoint1(lat,lang,radius)], in_threads: 2) do |collected_data|
+    data = Parallel.map([testEndPoint(lat,lang,radius), testEndPoint1(lat,lang,radius)], in_threads: 2) do |collected_data|
       if collected_data == testEndPoint(lat,lang,radius)
         (collected_data).each do |i|
           response = Hash.new
@@ -39,12 +30,11 @@ class Lib
           response[:state_id] = i.state_id
           response[:name] = i.name
           response[:created_at] = i.created_at
-          response[:longitude] = i.longitude
-          response[:latitude] = i.latitude
+          response[:soffender_longitude] = i.longitude
+          response[:soffender_latitude] = i.latitude
           response[:address_1] = i.address_1
           response[:photo_url] = i.photo_url
           response[:age] = i.age
-          @data.push(response)
         end
       elsif collected_data ==  testEndPoint1(lat,lang,radius)
         (collected_data).each do |e|
@@ -59,12 +49,14 @@ class Lib
           response[:longitude] = e.longitude
           response[:id] = e.id
           response[:primary_type] = e.primary_type
-          @data.push(response)
         end
       end
     end    
-    return @data 
+    respond_to do |format|
+        format.json { render :json => data  }
+    end
   end
+  
   
   def testEndPoint(lat,lang,radius)
     client = SODA::Client.new({ :domain => 'moto.demo.socrata.com', :app_token => 'v1SkHrbzQcyFmlkL9D5W1UXfT' })
@@ -97,24 +89,3 @@ class Lib
   end
   
 end
-
-# get ALL posts
-get "/" do 
-  erb :"posts/index"
-end
-
-## for desktop or web user to hit the api for get request
-get "/api/web/data.json" do
-  content_type :json
-    a = Lib.new 
-    lat = params[:lat]
-    lang = params[:lang]
-    radius = params[:radius]
-    zoom = params[:zoomLevel]
-    
-    #response = 
-    response = a.data(lat,lang,radius,zoom)
-    response.to_json
-end
-
-

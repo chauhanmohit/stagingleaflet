@@ -3,6 +3,7 @@ GEM
   specs:
     hashie (3.4.2)
     json (1.8.3)
+    parallel (1.6.1)
     rack (1.6.4)
     rack-protection (1.5.3)
       rack
@@ -20,6 +21,7 @@ PLATFORMS
 
 DEPENDENCIES
   json
+  parallel
   rest-open-uri
   sinatra
   soda-ruby

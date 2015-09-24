@@ -7,6 +7,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	'lat' : 41.8838113,
 	'lang' : -87.6317489,
 	'radius' : 500,
+	'zoomLevel':10,
 	'from' : '2012-09-14',
 	'to' : '2012-12-25',
 	'type': ["THEFT","ASSAULT","BATTERY","ROBBERY"],
@@ -20,8 +21,8 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
                 maxZoom: 21,
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors, Points &copy 2012 LINZ'
                         }),latlng = L.latLng($scope.search.lat, $scope.search.lang);
-    $scope.map = L.map('map', {center: latlng, zoom: 16, layers: [tiles]});
-    $scope.markers = L.markerClusterGroup({ chunkedLoading: true , disableClusteringAtZoom: 18 });
+    $scope.map = L.map('map', {center: latlng, zoom: 5, layers: [tiles]});
+    $scope.markers = L.markerClusterGroup({ chunkedLoading: true });
 
     /**
      *  Get latlang on click of showlocation button
@@ -70,6 +71,7 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	$scope.search.lat = e.target.getCenter().lat;
 	$scope.search.lang = e.target.getCenter().lng;
 	$scope.search.radius = distance < 1000 ? distance = 1000 : distance ;
+	$scope.search.zoomLevel = e.target.getZoom();
 	$scope.$apply();
     });
     
@@ -84,8 +86,45 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	var distance = getDistance(center, ne);
 	var cal = parseFloat((distance*10)/100) ;
 	var radius = parseFloat(distance + cal) ;
+	//parseInt($scope.map.getZoom() ) < 10 ? $scope.search.zoomLevel = $scope.map.getZoom() : 10 ;
+	$scope.search.zoomLevel = $scope.map.getZoom();
 	$scope.search.radius = radius ;
     }
+    
+    
+    /**
+     *	marker onclick event get
+     **/
+//    $scope.markers.on('click',function(e){
+//	console.log(e);
+//	var layer = e.target;
+//	var hazardIconHighlight = L.icon({
+//	    iconUrl: "/map-icon/marker-icon.png",
+//	    iconSize: [16, 16],
+//	    iconAnchor: [8, 8],
+//	    popupAnchor: [0, 0],
+//	    shadowUrl: "/map-icon/marker-shadow.png",
+//	    shadowSize: [24, 24],
+//	    shadowAnchor: [12, 12]
+//	});
+//	layer.setIcon(layer.options.icon == arms ? stop : arms);
+//	//var m = e.layer.options.icon.options.className ;
+//	//m.className = 'marker-cluster-mystyleMarker' ;
+//	//console.log(m, e.layer.options.icon.options.className);
+//	//console.log(e);
+//	//var mymarker = $scope.markers ;        
+//	//var hazardIconHighlight = L.icon({
+//	//    iconUrl: "/map-icon/marker-icon.png",
+//	//    iconSize: [16, 16],
+//	//    iconAnchor: [8, 8],
+//	//    popupAnchor: [0, 0],
+//	//    shadowUrl: "/map-icon/marker-shadow.png",
+//	//    shadowSize: [24, 24],
+//	//    shadowAnchor: [12, 12]
+//	//});
+//	//
+//	//e.layer.setIcon(hazardIconHighlight);
+//    });
     
     /**
      *  function to get Data from Scorata Api 
@@ -107,33 +146,55 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
 	var LeafIcon = L.Icon.extend({
 					options: {
 					    shadowUrl: '/map-icon/marker-shadow.png',
-					    iconSize:     [45, 45], // size of the icon
-					    shadowSize:   [41, 41], // size of the shadow
+					    iconSize:     [25, 41], // size of the icon
+					    shadowSize:   [25, 41], // size of the shadow
 					}
 				    });
-	var greenIcon = new LeafIcon({iconUrl: '/map-icon/mark1.png'}),
-			redIcon = new LeafIcon({iconUrl: '/map-icon/mark2.png'}),
-			orangeIcon = new LeafIcon({iconUrl: '/map-icon/mark3.png'}),
-			purpleIcon = new LeafIcon({iconUrl: '/map-icon/mark4.png'}),
-			defaultIcon = new LeafIcon({iconUrl: '/map-icon/marker-icon.png'});
+	var defaultIcon = new LeafIcon({iconUrl: '/map-icon/marker-icon.png'});
 			
-	//$http.post('/api/web/data.json', { 'data': $scope.search })
-        $http.get('/api/web/data.json?lat='+$scope.search.lat+'&lang='+$scope.search.lang+'&radius='+$scope.search.radius+'&from='+$scope.search.from+'&to='+$scope.search.to+'&type='+$scope.search.type+'&arrest='+$scope.search.arrest ,
+
+        $http.get('/api/web/data.json?lat='+$scope.search.lat+'&lang='+$scope.search.lang+'&radius='+$scope.search.radius+'&zoomLevel='+$scope.search.zoomLevel ,
 	{ timeout: canceller.promise })
         .success(function(res,status,config,header){
-	    $scope.removeOldMarkers();
-	    $scope.serverData = res ;
-	    console.log("data limit is", res.length															);
-            for (var i = 0; i < res.length; i++) {
-                var response = getContent(res[i]);
-		var image = res[i].primary_type == 'ASSAULT' ? redIcon : res[i].primary_type == 'ROBBERY' ? orangeIcon : res[i].primary_type == 'BATTERY' ? purpleIcon : res[i].primary_type == 'BATTERY' ? defaultIcon: greenIcon ;
-                var marker = L.marker(new L.LatLng(res[i].latitude, res[i].longitude),{icon: image});
-                marker.bindPopup(response);
-		if (marker !== null) $scope.markers.removeLayer(marker);
-                $scope.markers.addLayer(marker);
-            }
-            $scope.map.addLayer($scope.markers);
-	    $scope.showLoder = false ;
+	    if (parseInt($scope.map.getZoom()) < 11) {
+		$scope.removeOldMarkers();
+		$scope.serverData = res ;
+		for (var i = 0; i < res.length; i++) {
+		    if (res[i].center == undefined || res[i].center == null) {
+			console.log("there is not undefined center");
+		    }else {
+			if((res[i].center.latitude &&  res[i].center.longitude) && (res[i].center.latitude !== null &&  res[i].center.longitude !== null)) {
+			$scope.response = getContent(res[i]);
+			var marker = L.marker(new L.LatLng(res[i].center.latitude, res[i].center.longitude),{icon:defaultIcon});
+			var customOptions ={'maxWidth': '250','className' : 'customPopup'}
+			marker.bindPopup($scope.response,customOptions);
+			if (marker !== null) $scope.markers.removeLayer(marker);
+			$scope.markers.addLayer(marker);   
+			}
+		    }
+		}
+		$scope.map.addLayer($scope.markers);
+		$scope.showLoder = false ;
+	    }else{
+		console.log("length is",res.length);
+		for(var i=0; i < res.length; i++){
+		    $scope.removeOldMarkers();
+		    $scope.serverData = res ;
+		    for (var i = 0; i < res.length; i++) {
+		        if (res[i].latitude == undefined || res[i].longitude == null) {
+		    	console.log("there is not undefined center");
+		        }else {
+			    var response = res[i].type = 'sex_offender' ? getContent1(res[i]) : res[i].type = 'crime' ? getContent2(res[i]): 'No Data' ;
+			    var marker = L.marker(new L.LatLng(res[i].latitude, res[i].longitude),{icon:defaultIcon});
+			    marker.bindPopup(response);
+			    if (marker !== null) $scope.markers.removeLayer(marker);
+			    $scope.markers.addLayer(marker);   
+		        }
+		    }
+		    $scope.map.addLayer($scope.markers);
+		    $scope.showLoder = false ;    
+		}
+	    }
 	}).error(function(err,status,config,header){
 	    $scope.showLoder = false ;
 	    $timeout(function(){
@@ -157,46 +218,133 @@ app.controller('mainController',['$scope','$http','$q','$timeout',function($scop
      *  marke popup
      **/
     function getContent(data) {
+	
 	var infoData = '<div class="CustomData">'+
                                 '<div class="row">'+
-                                    '<div class="col-sm-6"><strong>Arrest</strong>:</div>'+
-                                    '<div class="col-sm-3">'+ data.arrest + '</div>'+
+                                    '<div class="col-sm-6"><strong>Agency Name</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.agency_name + '</div>'+
                                 '</div>' +
                                 '<div class="row">'+
-                                    '<div class="col-sm-6"><strong>Beat</strong>:</div>'+
-                                    '<div class="col-sm-3">'+ data.beat + '</div>'+
+                                    '<div class="col-sm-6"><strong>City</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.city + '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
-                                    '<div class="col-sm-6"><strong>Case Number</strong>:</div>'+
-                                    '<div class="col-sm-3">'+ data.case_number + '</div>'+
+                                    '<div class="col-sm-6"><strong>Agency Type</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.agency_type + '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
-                                    '<div class="col-sm-6"><strong>Date</strong>:</div>'+
-                                    '<div class="col-sm-6">'+ new Date(data.date) + '</div>'+
+                                    '<div class="col-sm-6"><strong>Agency Id</strong>:</div>'+
+                                    '<div class="col-sm-6">'+ data.agency_id + '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
-                                    '<div class="col-sm-6"><strong>Domestic</strong>:</div>'+
-                                    '<div class="col-sm-3">'+ data.domestic + '</div>'+
+                                    '<div class="col-sm-6"><strong>Email</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.email + '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
-                                    '<div class="col-sm-6"><strong>Fbi Code</strong>:</div>'+
-                                    '<div class="col-sm-3">'+ data.fbi_code + '</div>'+
+                                    '<div class="col-sm-6"><strong>TipSoft Id</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.tipsoft_id + '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
-                                    '<div class="col-sm-6"><strong>Description</strong>:</div>'+
-                                    '<div class="col-sm-6">'+ data.description + '</div>'+
+                                    '<div class="col-sm-6"><strong>State</strong>:</div>'+
+                                    '<div class="col-sm-6">'+ data.state + '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
-                                    '<div class="col-sm-6"><strong>Primary Type</strong>:</div>'+
-                                    '<div class="col-sm-3">'+ data.primary_type + '</div>'+
+                                    '<div class="col-sm-6"><strong>Zip code</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.zip + '</div>'+
                                 '</div>'+
                                 '<div class="row">'+
-                                    '<div class="col-sm-6"><strong>Year</strong>:</div>'+
-                                    '<div class="col-sm-3">'+ data.year + '</div>'+
+                                    '<div class="col-sm-6"><strong>center</strong>:</div>'+
+                                    '<div class="col-sm-3">('+ data.center.latitude+','+data.center.longitude + ')</div>'+
                                 '</div>'+
                             '</div>';
 	return infoData ;
     }
+    
+    /**
+     *  Customized the data for the onclick
+     *  marke popup
+     **/
+    function getContent1(data) {
+
+	var infoData = '<div class="CustomData">'+
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>Type</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.type  + '</div>'+
+                                '</div>' +				
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>sex_offender id</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.sex_offender_id + '</div>'+
+                                '</div>' +
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>state_id</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.state_id + '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>name</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.name + '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>created_at</strong>:</div>'+
+                                    '<div class="col-sm-6">'+ data.created_at + '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>address_1</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.address_1 + '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>photo_url</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.photo_url + '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>age</strong>:</div>'+
+                                    '<div class="col-sm-6">'+ data.age + '</div>'+
+                                '</div>'+
+                            '</div>';
+	return infoData ;
+    }
+    
+    /**
+     *  Customized the data for the onclick
+     *  marke popup
+     **/
+    function getContent2(data) {
+	var infoData = '<div class="CustomData">'+
+				'<div class="row">'+
+                                    '<div class="col-sm-6"><strong>Type</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.type + '</div>'+
+                                '</div>' +
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>arrest</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.arrest ? data.arrest : data.name + '</div>'+
+                                '</div>' +
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>case_number</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.case_number + '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>date</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.date + '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>description</strong>:</div>'+
+                                    '<div class="col-sm-6">'+ data.description + '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>location_description</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.location_description ? data.location_description : data.address_1 + '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>id</strong>:</div>'+
+                                    '<div class="col-sm-3">'+ data.id + '</div>'+
+                                '</div>'+
+                                '<div class="row">'+
+                                    '<div class="col-sm-6"><strong>primary_type</strong>:</div>'+
+                                    '<div class="col-sm-6">'+ data.primary_type + '</div>'+
+                                '</div>'+
+                            '</div>';
+	return infoData ;
+    }
+
       
     rad = function(x) {
     	return x * Math.PI / 180;
